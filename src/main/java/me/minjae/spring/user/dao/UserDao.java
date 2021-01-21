@@ -19,7 +19,7 @@ public class UserDao {
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
-	
+
 	// 사용자 데이터 추가
 	public void add(User user) throws ClassNotFoundException, SQLException {
 		
