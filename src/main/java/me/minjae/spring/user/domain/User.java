@@ -8,6 +8,17 @@ public class User {
 	private String name;     // 이름
 	private String password; // 패스워드
 	
+	public User(String id, String name, String password) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.password = password;
+	}
+	
+	public User() {
+		
+	}
+	
 	public String getId() {
 		return id;
 	}
