@@ -1,12 +1,11 @@
-package me.minjae.spring.user.dao;
-
+package springbook.user.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.sql.DataSource;
-import me.minjae.spring.user.domain.User;
+import springbook.user.domain.User;
 
 /**
  * JDBC를 이용한 등록과 조회 기능이 있는 UserDao 클래스

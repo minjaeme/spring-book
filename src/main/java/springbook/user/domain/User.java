@@ -1,4 +1,4 @@
-package me.minjae.spring.user.domain;
+package springbook.user.domain;
 
 /**
  * 1-1 사용자 정보 저장용 자바빈 User 클래스
