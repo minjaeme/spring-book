@@ -16,18 +16,43 @@ import me.minjae.spring.user.domain.User;
  */
 public class UserDao {
 	private DataSource dataSource;
+	private JdbcContext jdbcContext;
 	
+	// 3-22 
+	public void setJdbcContext(JdbcContext jdbcContext) {
+		this.jdbcContext = jdbcContext;
+	}
+
 	// 1-42 UserDao
 	public void setDataSource(DataSource dataSource) {
+		this.jdbcContext = new JdbcContext();
+		jdbcContext.setDataSource(dataSource);
 		this.dataSource = dataSource;
 	}
 	
 	// 3-6
-	private PreparedStatement makeStatement(Connection c) throws SQLException {
-		PreparedStatement ps;
-		ps = c.prepareStatement("delete from users");
-		return ps;
+	
+	// 사용자 데이터 추가
+	public void add(final User user) throws ClassNotFoundException, SQLException {
+		// 3-16 중첩 클래스
+		this.jdbcContext.workWithStatementStrategy(
+			new StatementStrategy() {
+				public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+					PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?, ?, ?)");
+					ps.setString(1, user.getId());
+					ps.setString(2, user.getName());
+					ps.setString(3, user.getPassword());
+					return ps;
+				}
+			});
 	}
+	
+	// 2.7 deleteAll() 메소드
+	public void deleteAll() throws SQLException {
+		this.jdbcContext.executeSql("delete from users");
+	}
+		
+	
 	
 	// 3-11
 	public void jdbcContextWtihStatementStrategy(StatementStrategy stmt) throws SQLException {
@@ -63,31 +88,6 @@ public class UserDao {
 		return count;
 	}
 
-	// 사용자 데이터 추가
-	public void add(final User user) throws ClassNotFoundException, SQLException {
-		// 3-16 중첩 클래스
-		jdbcContextWtihStatementStrategy(
-			new StatementStrategy() {
-				public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-					PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?, ?, ?)");
-					ps.setString(1, user.getId());
-					ps.setString(2, user.getName());
-					ps.setString(3, user.getPassword());
-					return ps;
-				}
-			});
-	}
-	
-
-	// 2.7 deleteAll() 메소드
-	public void deleteAll() throws SQLException {
-		jdbcContextWtihStatementStrategy(
-				new StatementStrategy() {
-					public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-						return c.prepareStatement("delete from users");
-					}
-				});
-	}
 	
 	// 사용자 데이터 가져오기
 	public User get(String id) throws ClassNotFoundException, SQLException {
