@@ -1,6 +1,8 @@
 package me.minjae.spring.user.dao;
 
 import javax.sql.DataSource;
+
+import java.awt.Taskbar.State;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,34 +29,20 @@ public class UserDao {
 		return ps;
 	}
 	
-	// 2.7 deleteAll() 메소드
-	public void deleteAll() throws SQLException {
+	// 3-11
+	public void jdbcContextWtihStatementStrategy(StatementStrategy stmt) throws SQLException {
 		Connection c = null;
 		PreparedStatement ps = null;
 		
 		try {
 			c = dataSource.getConnection();
-			StatementStrategy strategy = new DeleteAllStatement();
-			ps = strategy.makePreparedStatement(c);
-			
-			ps.execute();
+			ps=stmt.makePreparedStatement(c);
+			ps.executeUpdate();
 		} catch (SQLException e) {
 			throw e;
 		} finally {
-			if (ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {
-					// TODO: handle exception
-				}
-			}
-			if (c != null) {
-				try {
-					c.close();
-				} catch (SQLException e) {
-					// TODO: handle exception
-				}
-			}
+			if (ps != null) { try { ps.close(); } catch (SQLException e) { }}
+			if (c != null) { try { c.close(); } catch (SQLException e) { }}
 		}
 	}
 
@@ -76,24 +64,29 @@ public class UserDao {
 	}
 
 	// 사용자 데이터 추가
-	public void add(User user) throws ClassNotFoundException, SQLException {
-		
-		Connection c = dataSource.getConnection();
-		
-		//2. SQL을 담은 Statement 또는 PreparedStatement 를 만든다.
-		PreparedStatement ps = c.prepareStatement(
-				"INSERT INTO users(id, name, password) VALUES(?,?,?)");
-		
-		ps.setString(1, user.getId());
-		ps.setString(2, user.getName());
-		ps.setString(3, user.getPassword());
-		
-		// 3. 만들어진 Statement를 실행한다.
-		ps.executeUpdate();
-		
-		// 4. 작업중에 생성된 Connection, Statement, ResultSet 리소스를 닫아 준다.
-		ps.close();
-		c.close();
+	public void add(final User user) throws ClassNotFoundException, SQLException {
+		// 3-16 중첩 클래스
+		jdbcContextWtihStatementStrategy(
+			new StatementStrategy() {
+				public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+					PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?, ?, ?)");
+					ps.setString(1, user.getId());
+					ps.setString(2, user.getName());
+					ps.setString(3, user.getPassword());
+					return ps;
+				}
+			});
+	}
+	
+
+	// 2.7 deleteAll() 메소드
+	public void deleteAll() throws SQLException {
+		jdbcContextWtihStatementStrategy(
+				new StatementStrategy() {
+					public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+						return c.prepareStatement("delete from users");
+					}
+				});
 	}
 	
 	// 사용자 데이터 가져오기

@@ -25,7 +25,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import me.minjae.spring.user.domain.User;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations="/test-applicationContext.xml")
+@ContextConfiguration(locations="/applicationContext.xml")
 // 2-20. 수동 DI를 적용
 @DirtiesContext
 public class UserDaoTest {
@@ -42,7 +42,7 @@ public class UserDaoTest {
 	public void setUp() {
 //		this.dao = this.context.getBean("userDao", UserDao.class);
 		dao = new UserDao();
-		DataSource dataSource = new SingleConnectionDataSource("jdbc:mariadb://127.0.0.1:3306/testdb", "root", "111111", true);
+		DataSource dataSource = new SingleConnectionDataSource("jdbc:mariadb://127.0.0.1:3306/spring", "root", "111111", true);
 		dao.setDataSource(dataSource);
 	}
 	
