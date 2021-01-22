@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.is;
 
 import java.sql.SQLException;
 import java.util.EmptyStackException;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -17,6 +18,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -42,6 +44,11 @@ public class UserDaoTest {
 	public void setUp() {
 //		this.dao = this.context.getBean("userDao", UserDao.class);
 		dao = new UserDao();
+		
+		user1 = new User("hyumee", "박성철", "springno1");
+		user2 = new User("leegw70", "이길", "springno2");
+		user3 = new User("hbumni", "박범", "springno3");
+		
 		DataSource dataSource = new SingleConnectionDataSource("jdbc:mariadb://127.0.0.1:3306/spring", "root", "111111", true);
 		dao.setDataSource(dataSource);
 	}
@@ -71,9 +78,7 @@ public class UserDaoTest {
 	@Test
 	public void count() throws  ClassNotFoundException, SQLException {
 		
-		user1 = new User("hyumee", "박성철", "springno1");
-		user2 = new User("leegw70", "이길", "springno2");
-		user3 = new User("hbumni", "박범", "springno3");
+		
 
 		dao.deleteAll();
 		assertThat(dao.getCount(), is(0));
@@ -90,13 +95,43 @@ public class UserDaoTest {
 	}
 	
 	// 2-13
-//	@Test(expected = EmptyStackException.class)
+	@Test(expected = EmptyResultDataAccessException.class)
 	public void getUserFailure() throws ClassNotFoundException, SQLException {
 		
 		dao.deleteAll();
 		assertThat(dao.getCount(), is(0));
 		
 		dao.get("unknown_id");
+	}
+	
+	@Test
+	public void getAll() throws ClassNotFoundException, SQLException {
+		dao.deleteAll();
+		
+		dao.add(user1);
+		List<User> users1 = dao.getAll();
+		assertThat(users1.size(), is(1));
+		checkSameUser(user1, users1.get(0));
+		
+		dao.add(user2);
+		List<User> users2 = dao.getAll();
+		assertThat(users2.size(), is(2));
+		checkSameUser(user1, users2.get(0));
+		checkSameUser(user2, users2.get(1));
+		
+		dao.add(user3);
+		List<User> users3 = dao.getAll();
+		assertThat(users3.size(), is(3));
+		checkSameUser(user3, users3.get(0));
+		checkSameUser(user1, users3.get(1));
+		checkSameUser(user2, users3.get(2));
+		
+	}
+	
+	private void checkSameUser(User user1, User user2) {
+		assertThat(user1.getId(), is(user2.getId()));
+		assertThat(user1.getName(), is(user2.getName()));
+		assertThat(user1.getPassword(), is(user2.getPassword()));
 	}
 
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {

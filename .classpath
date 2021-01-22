@@ -36,5 +36,6 @@
 	<classpathentry kind="lib" path="D:/eclipse-workspace/spring/jars/spring-expression-3.0.7.RELEASE.jar"/>
 	<classpathentry kind="lib" path="D:/eclipse-workspace/spring/jars/spring-jdbc-3.0.7.RELEASE.jar"/>
 	<classpathentry kind="lib" path="D:/eclipse-workspace/spring/jars/spring-test-3.0.7.RELEASE.jar"/>
+	<classpathentry kind="lib" path="D:/eclipse-workspace/spring/jars/spring-dao-2.0.6.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
