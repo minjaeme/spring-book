@@ -24,6 +24,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import me.minjae.spring.user.domain.Level;
 import me.minjae.spring.user.domain.User;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -45,9 +46,10 @@ public class UserDaoTest {
 //		this.dao = this.context.getBean("userDao", UserDao.class);
 		dao = new UserDao();
 		
-		user1 = new User("hyumee", "박성철", "springno1");
-		user2 = new User("leegw70", "이길", "springno2");
-		user3 = new User("hbumni", "박범", "springno3");
+		user1 = new User("hyumee", "박성철", "springno1", Level.BASIC, 1, 0);
+		user2 = new User("leegw70", "이길", "springno2", Level.SILVER, 55, 10);
+		user3 = new User("hbumni", "박범", "springno3", Level.GOLD, 100, 40);
+		
 		
 		DataSource dataSource = new SingleConnectionDataSource("jdbc:mariadb://127.0.0.1:3306/spring", "root", "111111", true);
 		dao.setDataSource(dataSource);
@@ -69,6 +71,12 @@ public class UserDaoTest {
 		dao.add(user);
 		assertThat(dao.getCount(), is(1));
 		
+		User userget1 = dao.get(user1.getId());
+		checkSameUser(userget1, user1);
+
+		User userget2 = dao.get(user2.getId());
+		checkSameUser(userget2, user2);
+		
 		User user2 = dao.get(user.getId());
 		
 		assertThat(user2.getName(), is(user.getName()));
@@ -77,9 +85,6 @@ public class UserDaoTest {
 	
 	@Test
 	public void count() throws  ClassNotFoundException, SQLException {
-		
-		
-
 		dao.deleteAll();
 		assertThat(dao.getCount(), is(0));
 		
@@ -132,6 +137,10 @@ public class UserDaoTest {
 		assertThat(user1.getId(), is(user2.getId()));
 		assertThat(user1.getName(), is(user2.getName()));
 		assertThat(user1.getPassword(), is(user2.getPassword()));
+		assertThat(user1.getLevel(), is(user2.getLevel()));
+		assertThat(user1.getLogin(), is(user2.getLogin()));
+		assertThat(user1.getRecommend(), is(user2.getRecommend()));
+		
 	}
 
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {
