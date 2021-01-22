@@ -1,6 +1,6 @@
 package me.minjae.spring.user.dao;
 
-
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,17 +15,49 @@ import me.minjae.spring.user.domain.User;
 public class UserDao {
 	private DataSource dataSource;
 	
-	// 2.7 deleteAll() 메소드
-	public void deleteAll() throws SQLException {
-		Connection c = dataSource.getConnection();
-		
-		PreparedStatement ps = c.prepareStatement("delete from users");
-		ps.execute();
-		
-		ps.close();
-		c.close();
+	// 1-42 UserDao
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
 	}
 	
+	// 3-6
+	private PreparedStatement makeStatement(Connection c) throws SQLException {
+		PreparedStatement ps;
+		ps = c.prepareStatement("delete from users");
+		return ps;
+	}
+	
+	// 2.7 deleteAll() 메소드
+	public void deleteAll() throws SQLException {
+		Connection c = null;
+		PreparedStatement ps = null;
+		
+		try {
+			c = dataSource.getConnection();
+			StatementStrategy strategy = new DeleteAllStatement();
+			ps = strategy.makePreparedStatement(c);
+			
+			ps.execute();
+		} catch (SQLException e) {
+			throw e;
+		} finally {
+			if (ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {
+					// TODO: handle exception
+				}
+			}
+			if (c != null) {
+				try {
+					c.close();
+				} catch (SQLException e) {
+					// TODO: handle exception
+				}
+			}
+		}
+	}
+
 	// 2.8 getCount() 메소드
 	public int getCount() throws SQLException {
 		Connection c = dataSource.getConnection();

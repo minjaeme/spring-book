@@ -15,4 +15,5 @@
 	<bean id="userDao" class="me.minjae.spring.user.dao.UserDao">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
+	
 </beans>

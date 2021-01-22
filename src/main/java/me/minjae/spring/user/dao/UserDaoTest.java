@@ -6,6 +6,8 @@ import static org.hamcrest.CoreMatchers.is;
 import java.sql.SQLException;
 import java.util.EmptyStackException;
 
+import javax.sql.DataSource;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
@@ -23,13 +25,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import me.minjae.spring.user.domain.User;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations="/applicationContext.xml")
+@ContextConfiguration(locations="/test-applicationContext.xml")
 // 2-20. 수동 DI를 적용
 @DirtiesContext
 public class UserDaoTest {
 	
 	// 2-17. 스프링 테스트 컨텍스트
-	@Autowired
 	UserDao dao;
 	
 	// 2-15. 중복 코드를 제거
@@ -40,7 +41,8 @@ public class UserDaoTest {
 	@Before
 	public void setUp() {
 //		this.dao = this.context.getBean("userDao", UserDao.class);
-		DataSource dataSource = new SingleConnectionDataSource("jdbc:mariadb://127.0.0.1:3306/spring", "root", "111111", true);
+		dao = new UserDao();
+		DataSource dataSource = new SingleConnectionDataSource("jdbc:mariadb://127.0.0.1:3306/testdb", "root", "111111", true);
 		dao.setDataSource(dataSource);
 	}
 	
